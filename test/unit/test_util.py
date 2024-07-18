@@ -9,7 +9,7 @@ from botorch.exceptions import BotorchTensorDimensionError
 from botorch.utils.containers import TrainingData
 from scipy.optimize import Bounds
 
-from bayesopt4ros.data_handler import DataHandler
+from src.bayesopt4ros.data_handler import DataHandler
 
 
 @pytest.fixture(params=[1, 3, 10])

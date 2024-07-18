@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import rospy
+#import rospy
 import torch
 import yaml
 
@@ -60,7 +60,7 @@ class DataHandler(object):
                 x.append(torch.tensor(data["train_inputs"]))
                 y.append(torch.tensor(data["train_targets"]))
             except FileNotFoundError:
-                rospy.logwarn(f"The evaluations file '{file}' could not be found.")
+                print(f"The evaluations file '{file}' could not be found.")
 
         if x and y:
             if (
@@ -98,7 +98,6 @@ class DataHandler(object):
         if not isinstance(y, Tensor):
             y = torch.tensor([[y]])
         x = torch.atleast_2d(x)
-        self._validate_data_args(x, y)
         x = torch.cat((self.data.Xs, x)) if self.n_data else x
         y = torch.cat((self.data.Ys, y)) if self.n_data else y
         self.set_xy(x=x, y=y)
@@ -127,7 +126,7 @@ class DataHandler(object):
         if self.maximize:
             return torch.max(self.data.Ys)
         else:
-            return torch.min(self.data.Ys)
+            return torch.min(self.data.Ys,dim=0)
 
     @property
     def y_best_accumulate(self):
@@ -151,7 +150,8 @@ class DataHandler(object):
             message = f"Input dimension is assumed 2-dim. not {x.ndim}-dim."
             raise BotorchTensorDimensionError(message)
         if y.dim() != 2:
-            message = f"Output dimension is assumed 2-dim. not {x.ndim}-dim."
+            #print(y.dim())
+            message = f"Output dimension is assumed 2-dim. not {y.ndim}-dim."
             raise BotorchTensorDimensionError(message)
         if y.shape[1] != 1:
             message = "We only support 1-dimensional outputs for the moment."

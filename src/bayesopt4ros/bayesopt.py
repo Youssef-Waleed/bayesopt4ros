@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import os
-import rospy
+#import rospy
 import torch
 import yaml
 
@@ -23,11 +23,10 @@ from botorch.optim import optimize_acqf as optimize_acqf_botorch
 from botorch.optim.fit import fit_gpytorch_torch
 
 from gpytorch.mlls import ExactMarginalLogLikelihood
-
-from bayesopt4ros import util
-from bayesopt4ros.data_handler import DataHandler
-from bayesopt4ros.msg import BayesOptAction  # type: ignore
-from bayesopt4ros.util import PosteriorMean
+import util
+from data_handler import DataHandler
+#from bayesopt4ros.msg import BayesOptAction  # type: ignore
+from util import PosteriorMean
 
 
 class BayesianOptimization(object):
@@ -101,7 +100,7 @@ class BayesianOptimization(object):
 
         if log_dir is not None:
             self.log_dir = util.create_log_dir(log_dir)
-
+        #print(bounds)
         assert bounds.shape[1] == self.input_dim
 
     @classmethod
@@ -140,7 +139,7 @@ class BayesianOptimization(object):
             config=config,
         )
 
-    def next(self, goal: BayesOptAction) -> Tensor:
+    def next(self, y_n, c_n_plus) -> Tensor:
         """Compute new parameters to perform an experiment with.
 
         The functionality of this method can generally be split into three steps:
@@ -160,17 +159,18 @@ class BayesianOptimization(object):
             The new parameters as an array.
         """
         # 1) Update the model with the new data
-        self._update_model(goal)
+        self._update_model(y_n, c_n_plus)
 
         # 2) Retrieve a new point as response of the server
         self.x_new = self._get_next_x()
+        #print(self.x_new, "new")
 
         # 3) Save current state to file
         self._log_results()
 
         return self.x_new
 
-    def update_last_goal(self, goal: BayesOptAction) -> None:
+    def update_last_goal(self, y_n, c_n_plus) -> None:
         """Updates the GP model with the last function value obtained.
 
         .. note:: This function is only called once from the server, right before
@@ -182,7 +182,7 @@ class BayesianOptimization(object):
         goal : BayesOptAction
             The goal sent from the client for the last recent experiment.
         """
-        self._update_model(goal)
+        self._update_model(y_n, c_n_plus)
         self._log_results()
 
     def get_optimal_parameters(self) -> Tuple[torch.Tensor, float]:
@@ -249,6 +249,9 @@ class BayesianOptimization(object):
         """
         if self.n_data < self.n_init:  # We are in the initialization phase
             x_new = self.x_init[self.n_data]
+            #print(self.x_init, "init")
+            #print(self.x_new, "new")
+
         else:  # Actually optimizing the acquisition function for new points
             x_new = self._optimize_acqf(
                 self._initialize_acqf(), visualize=self.debug_visualization
@@ -256,7 +259,7 @@ class BayesianOptimization(object):
 
             # To avoid numerical issues and encourage exploration
             if self._check_data_vicinity(x_new, self.data_handler.get_xy()[0]):
-                rospy.logwarn("[BayesOpt] x_new is too close to existing data.")
+                print("[BayesOpt] x_new is too close to existing data.")
                 lb, ub = self.bounds[0], self.bounds[1]
                 x_rand = lb + (ub - lb) * torch.rand((self.input_dim,))
                 x_new = x_rand
@@ -280,7 +283,7 @@ class BayesianOptimization(object):
                 try:
                     assert load_config[p] == self.__getattribute__(p)
                 except AssertionError:
-                    rospy.logerr(f"Your configuration does not match with {load_dir}")
+                    print(f"Your configuration does not match with {load_dir}")
 
     def _load_prev_bayesopt(
         self, load_dirs: Union[str, List[str]]
@@ -317,7 +320,7 @@ class BayesianOptimization(object):
 
         return self.data_handler, self.gp
 
-    def _update_model(self, goal) -> None:
+    def _update_model(self, y_n, c_n_plus) -> None:
         """Updates the GP with new data. Creates a model if none exists yet.
 
         Parameters
@@ -336,7 +339,7 @@ class BayesianOptimization(object):
         # is used instead, the normalization/standardization of the input/output
         # data is not updated in the GPyTorchModel. We also want at least 2 data
         # points such that the input normalization works properly.
-        self.data_handler.add_xy(x=self.x_new, y=goal.y_new)
+        self.data_handler.add_xy(x=self.x_new, y=y_n)
         self.gp = self._initialize_model(self.data_handler)
         self._fit_model()
 
@@ -386,7 +389,8 @@ class BayesianOptimization(object):
                 model=self.gp, beta=4.0, maximize=self.maximize
             )
         elif self.acq_func.upper() == "EI":
-            best_f = self.data_handler.y_best  # note that EI assumes noiseless
+            #print(self.data_handler.data.Ys)
+            best_f = self.data_handler.y_best# note that EI assumes noiseless
             acq_func = ExpectedImprovement(
                 model=self.gp, best_f=best_f, maximize=self.maximize
             )
@@ -470,6 +474,11 @@ class BayesianOptimization(object):
         x0_init = sobol_eng.draw(n_init)  # points are in [0, 1]^d
         return self.bounds[0] + (self.bounds[1] - self.bounds[0]) * x0_init
 
+        sobol_eng = torch.quasirandom.SobolEngine(dimension=self.input_dim)
+        sobol_eng.fast_forward(n=1)  # first point is origin, boring...
+        x0_init = sobol_eng.draw(n_init)  # points are in [0, 1]^d
+        return self.bounds[0] + (self.bounds[1] - self.bounds[0]) * x0_init
+
     def _check_data_vicinity(self, x1, x2):
         """Returns true if `x1` is close to any point in `x2`.
 
@@ -535,6 +544,7 @@ class BayesianOptimization(object):
         data = {k: v.tolist() for k, v in data.items()}
         self.evaluations_file = os.path.join(self.log_dir, "evaluations.yaml")
         yaml.dump(data, open(self.evaluations_file, "w"), indent=2)
+        #print(self.x_new)
 
     def _debug_acqf_visualize(self, acq_func, x_opt, f_opt):
         """Visualize the acquisition function for debugging purposes."""
@@ -593,6 +603,6 @@ class BayesianOptimization(object):
 
         plt.tight_layout()
         file_name = os.path.join(self.log_dir, f"acqf_visualize_{x_eval.shape[0]}.pdf")
-        rospy.logdebug(f"Saving debug visualization to: {file_name}")
+        print(f"Saving debug visualization to: {file_name}")
         plt.savefig(file_name, format="pdf")
         plt.close()

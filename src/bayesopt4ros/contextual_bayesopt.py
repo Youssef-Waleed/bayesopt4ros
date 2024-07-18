@@ -15,9 +15,9 @@ from botorch.models.transforms.outcome import Standardize
 from gpytorch.kernels import MaternKernel, ScaleKernel
 from gpytorch.priors import GammaPrior
 
-from bayesopt4ros import BayesianOptimization
-from bayesopt4ros.data_handler import DataHandler
-from bayesopt4ros.util import PosteriorMean
+from bayesopt import BayesianOptimization
+from data_handler import DataHandler
+from util import PosteriorMean
 
 
 class ContextualBayesianOptimization(BayesianOptimization):
@@ -168,7 +168,7 @@ class ContextualBayesianOptimization(BayesianOptimization):
         """
         return ["input_dim", "context_dim", "maximize"]
 
-    def _update_model(self, goal):
+    def _update_model(self, y_n, c_n_plus):
         """Updates the GP with new data as well as the current context. Creates
         a model if none exists yet.
 
@@ -182,17 +182,18 @@ class ContextualBayesianOptimization(BayesianOptimization):
         if self.x_new is None and self.context is None:
             # The very first function value we obtain from the client is just to
             # trigger the server. At that point, there is no new input point,
-            # hence, no need to need to update the model. However, the initial
+            # hence, no need to update the model. However, the initial
             # context is already valid.
-            self.context = torch.tensor(goal.c_new)
+            self.context = torch.tensor(c_n_plus)
             self.prev_context = self.context
             return
-
+        #print(self.x_new)
         # Concatenate context and optimization variable
         x = torch.cat((self.x_new, self.context))
-        self.data_handler.add_xy(x=x, y=goal.y_new)
+        self.data_handler.add_xy(x=x, y=y_n)
         self.prev_context = self.context
-        self.context = torch.tensor(goal.c_new)
+        #self.context = torch.tensor(c_n_plus)
+        self.context = c_n_plus.clone().detach().requires_grad_(True)
 
         # Note: We always create a GP model from scratch when receiving new data.
         # The reason is the following: if the 'set_train_data' method of the GP

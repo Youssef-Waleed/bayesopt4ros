@@ -1,4 +1,4 @@
-import rospy
+
 
 from functools import wraps
 from torch import Tensor
@@ -99,7 +99,7 @@ def create_log_dir(log_dir):
     import time
 
     log_dir = os.path.join(log_dir, time.strftime("%Y-%m-%d-%H-%M-%S"))
-    os.makedirs(log_dir, exist_ok=True)
-    rospy.loginfo(f"Logging directory: {log_dir}")
+    os.makedirs(log_dir, exist_ok=False)
+    #print(f"Logging directory: {log_dir}")
 
     return log_dir
