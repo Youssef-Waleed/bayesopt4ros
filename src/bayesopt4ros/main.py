@@ -5,7 +5,7 @@ import numpy as np
 import socket
 
 
-TCP_IP = '192.168.178.138'
+TCP_IP = "192.168.178.138"
 TCP_PORT = 5000
 
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -85,15 +85,15 @@ opt = cbo.from_file("forrester_ei.yaml")
 #lower_bound: [0.5,0.9,0.5],upper_bound: [2.5,1.1,2.5] 15 laps 1st place but broke the simulation
 #2024-06-23-14-52-06 , 2024-06-24-12-06-05 50 laps 2nd place continouiation
 #2024-06-30-22-27-08 100 lap corner update
-opt._load_prev_bayesopt("2024-07-13-12-19-31")
+opt._load_prev_bayesopt("2024-07-15-17-21-27")
 
 #choose your poison
 
-c_n = torch.randn(1, 2)
+c_n = torch.randn(1, 9)
 c_n = c_n.squeeze()
 opt.x_new = opt.next(None, c_n)
 
-client_socket.sendall(np.array(torch.tensor(1.0), dtype=np.float64))
+client_socket.sendall(np.array([1.0], dtype=np.float64))
 
 
 while 1:
@@ -109,8 +109,9 @@ while 1:
     opt.x_new = opt.next(reward, c_n)
 
     print("x_new: ", opt.x_new)
-    tensor_data = opt.x_new.numpy().flatten()
-    client_socket.sendall(np.array(opt.x_new, dtype=np.float64))
+    tensor_data = opt.x_new.detach().numpy().flatten()
+    client_socket.sendall(np.array(tensor_data, dtype=np.float64))
+
 
 
 

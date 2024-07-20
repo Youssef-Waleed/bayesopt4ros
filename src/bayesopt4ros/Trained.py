@@ -5,7 +5,7 @@ import numpy as np
 import socket
 
 
-TCP_IP = '192.168.178.138'
+TCP_IP = "192.168.178.138"
 TCP_PORT = 5000
 
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -13,7 +13,7 @@ client_socket.connect((TCP_IP, TCP_PORT))
 
 opt = cbo.from_file("forrester_ei.yaml")
 
-opt._load_prev_bayesopt("2024-07-14-00-32-34")
+opt._load_prev_bayesopt("2024-07-13-21-23-31")
 
 #choose your poison
 
