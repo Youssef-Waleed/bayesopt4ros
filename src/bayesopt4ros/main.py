@@ -5,7 +5,7 @@ import numpy as np
 import socket
 
 
-TCP_IP = "192.168.178.138"
+TCP_IP = "192.168.1.101"
 TCP_PORT = 5000
 
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -74,6 +74,18 @@ opt = cbo.from_file("forrester_ei.yaml")
 #2024-07-14-19-49-01
 #150
 #2024-07-15-11-32-09
+#166
+#2024-07-21-16-44gg 188 07-21-18-58-52
+#200
+#2024-07-21-21-30-18
+#209
+#2024-07-22-21-57-47
+#209+17
+#2024-07-22-23-39-18
+#249
+#2024-07-23-02-48-27
+
+
 #------------------------------------
 #2024-06-26-13-01-38
 #2024-06-26-23-37-22
@@ -85,7 +97,7 @@ opt = cbo.from_file("forrester_ei.yaml")
 #lower_bound: [0.5,0.9,0.5],upper_bound: [2.5,1.1,2.5] 15 laps 1st place but broke the simulation
 #2024-06-23-14-52-06 , 2024-06-24-12-06-05 50 laps 2nd place continouiation
 #2024-06-30-22-27-08 100 lap corner update
-opt._load_prev_bayesopt("2024-07-15-17-21-27")
+opt._load_prev_bayesopt("2024-07-15-20-12-51")
 
 #choose your poison
 

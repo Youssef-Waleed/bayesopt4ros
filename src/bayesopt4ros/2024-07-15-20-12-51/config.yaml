@@ -2,7 +2,7 @@ acq_func: UCB
 context_dim: 9
 experiment_name: example_1d_forrester
 input_dim: 3
-log_dir: C:\Users\youse\PycharmProjects\bayesopt4ros\src\bayesopt4ros
+log_dir: C:\Users\Youssef\PycharmProjects\bayesopt4ros\src\bayesopt4ros
 lower_bound:
 - 0.5
 - 0.9
