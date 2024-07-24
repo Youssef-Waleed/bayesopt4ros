@@ -50,7 +50,12 @@ opt = cbo.from_file("forrester_ei.yaml")
 #2024-07-15-17-21-27
 #150
 #2024-07-15-20-12-51
-#
+#156
+#2024-07-23-13-47-51
+#161
+#2024-07-23-15-33-05
+#199
+#2024-07-23-19-26-31
 
 #------------------------------------
 #3rd complexity
@@ -97,7 +102,7 @@ opt = cbo.from_file("forrester_ei.yaml")
 #lower_bound: [0.5,0.9,0.5],upper_bound: [2.5,1.1,2.5] 15 laps 1st place but broke the simulation
 #2024-06-23-14-52-06 , 2024-06-24-12-06-05 50 laps 2nd place continouiation
 #2024-06-30-22-27-08 100 lap corner update
-opt._load_prev_bayesopt("2024-07-15-20-12-51")
+opt._load_prev_bayesopt("2024-07-23-19-14-51")
 
 #choose your poison
 

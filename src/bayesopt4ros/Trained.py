@@ -13,7 +13,7 @@ client_socket.connect((TCP_IP, TCP_PORT))
 
 opt = cbo.from_file("forrester_ei.yaml")
 
-opt._load_prev_bayesopt("2024-07-21-21-30-18")
+opt._load_prev_bayesopt("2024-07-23-19-26-31")
 
 #choose your poison
 
