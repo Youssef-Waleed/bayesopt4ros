@@ -12,6 +12,57 @@ client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 client_socket.connect((TCP_IP, TCP_PORT))
 
 opt = cbo.from_file("forrester_ei.yaml")
+
+#1st random
+#5
+#2024-08-03-23-17-59
+#11
+#2024-08-03-23-36-07#2024-08-04-00-25-05
+#21
+#2024-08-04-00-27-52
+#25
+#2024-08-04-00-59-20
+#50
+#2024-08-04-01-25-04
+#98
+#2024-08-04-12-01-23
+#100
+#103
+#108
+#2024-08-04-16-48-13
+#2024-08-04-15-59-19
+#119
+#2024-08-04-17-35-56
+#150
+#2024-08-04-19-40-48
+
+#opt._load_prev_bayesopt("2024-08-04-17-35-56")
+
+#choose your poison
+
+c_n = torch.randn(1, 2)
+c_n = c_n.squeeze()
+opt.x_new = opt.next(None, c_n)
+
+client_socket.sendall(np.array([1.0], dtype=np.float64))
+
+
+while 1:
+
+    reward_data = client_socket.recv(64)
+    reward = torch.tensor([np.frombuffer(reward_data, dtype=np.float64).tolist()])
+    print("reward: ", reward)
+
+    context_data = client_socket.recv(640)
+    c_n = torch.tensor(np.frombuffer(context_data, dtype=np.float64).tolist())
+    print("context: ", c_n)
+
+    opt.x_new = opt.next(reward, c_n)
+
+    print("x_new: ", opt.x_new)
+    tensor_data = opt.x_new.detach().numpy().flatten()
+    client_socket.sendall(np.array(tensor_data, dtype=np.float64))
+
 #simple 37 laps
 #2024-07-07-08-59-25
 #66
@@ -50,7 +101,8 @@ opt = cbo.from_file("forrester_ei.yaml")
 #2024-07-15-17-21-27
 #150
 #2024-07-15-20-12-51
-#
+#199
+#2024-07-23-19-26-31
 
 #------------------------------------
 #3rd complexity
@@ -85,33 +137,20 @@ opt = cbo.from_file("forrester_ei.yaml")
 #lower_bound: [0.5,0.9,0.5],upper_bound: [2.5,1.1,2.5] 15 laps 1st place but broke the simulation
 #2024-06-23-14-52-06 , 2024-06-24-12-06-05 50 laps 2nd place continouiation
 #2024-06-30-22-27-08 100 lap corner update
-opt._load_prev_bayesopt("2024-07-15-17-21-27")
 
-#choose your poison
-
-c_n = torch.randn(1, 9)
-c_n = c_n.squeeze()
-opt.x_new = opt.next(None, c_n)
-
-client_socket.sendall(np.array([1.0], dtype=np.float64))
-
-
-while 1:
-
-    reward_data = client_socket.recv(64)
-    reward = torch.tensor([np.frombuffer(reward_data, dtype=np.float64).tolist()])
-    print("reward: ", reward)
-
-    context_data = client_socket.recv(640)
-    c_n = torch.tensor(np.frombuffer(context_data, dtype=np.float64).tolist())
-    print("context: ", c_n)
-
-    opt.x_new = opt.next(reward, c_n)
-
-    print("x_new: ", opt.x_new)
-    tensor_data = opt.x_new.detach().numpy().flatten()
-    client_socket.sendall(np.array(tensor_data, dtype=np.float64))
-
+#25
+#2024-08-03-12-34-46
+#42
+#2024-08-03-14-51-26
+#50
+#2024-08-03-16-17-38
+#65
+#2024-08-03-17-10-21
+#82
+#2024-08-03-18-34-32
+#100
+#2024-08-03-20-22-28
+#150
 
 
 

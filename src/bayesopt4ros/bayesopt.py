@@ -258,12 +258,12 @@ class BayesianOptimization(object):
             )[0]
 
             # To avoid numerical issues and encourage exploration
-            if self._check_data_vicinity(x_new, self.data_handler.get_xy()[0]):
+            """if self._check_data_vicinity(x_new, self.data_handler.get_xy()[0]):
                 print("[BayesOpt] x_new is too close to existing data.")
                 lb, ub = self.bounds[0], self.bounds[1]
                 x_rand = lb + (ub - lb) * torch.rand((self.input_dim,))
                 x_new = x_rand
-
+            """
         return x_new
 
     def _check_config(self, load_dirs: List[str]):
