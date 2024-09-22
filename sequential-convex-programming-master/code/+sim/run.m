@@ -323,11 +323,11 @@ while ctl_race_ongoing
                 if following_idx == -1
                     Pos = -1.0;
                 end
-%                 context = [cpDiff,(1/cfg.scn.track(closestCornerIdx).kappa)];
-                context = [p_L_rel,v_L_rel,p_F_rel,v_F_rel,Pos,cpDiff,cfg.scn.track(closestCornerIdx).kappa];
+%                 context = [cpDiff,(1/cfg.scn.track(closestCornerIdx).kappa)]; %Context for Corner models
+                context = [p_L_rel,v_L_rel,p_F_rel,v_F_rel,Pos,cpDiff,cfg.scn.track(closestCornerIdx).kappa]; %Context for Combined models
 %                 corner context
-%                 context = [p_L_rel,v_L_rel,p_F_rel,v_F_rel,Pos];
-%                   context = [1];
+%                 context = [p_L_rel,v_L_rel,p_F_rel,v_F_rel,Pos]; %Context for relative models
+%                   context = [1]; %incase of using BO instead of CBO to get average optimal parameters
 
                 %---------------------single--opp--context--------------------
                 %                     p_rel = [ws.vhs{nearest_idx}.x_0(1,:)-p_x,ws.vhs{1}.x_0(2,:)-p_y];
